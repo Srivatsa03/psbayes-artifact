@@ -35,6 +35,14 @@ artifact/
 │   └── timeseries/
 │       ├── fig3_postmean_oraclefree_vs_ttd.jpg  # paper: fig:rq3-postmean-overshoot
 │       └── fig4_psbayes_vs_ttd.jpg              # paper: fig:rq3-psbayes-tracking
+├── fuzzer/                 # instrumented libFuzzer + FuzzBench/LLVM pins
+│   ├── libfuzzer-psbayes.patch
+│   ├── builder.Dockerfile
+│   ├── runner.Dockerfile
+│   ├── fuzzer.py
+│   └── README.md           # how to rebuild and relaunch campaigns
+├── scripts/
+│   └── naive_avg.py        # Naive-Avg baseline (Table VII row)
 ├── requirements.txt
 ├── LICENSE
 └── README.md
@@ -100,7 +108,7 @@ TrialsToDisc (TTD) ground truth.
 
 ---
 
-## 4. Cell map (21 code cells)
+## 4. Cell map (22 code cells)
 
 | Cell | Purpose | Output |
 |------|---------|--------|
@@ -125,6 +133,7 @@ TrialsToDisc (TTD) ground truth.
 | 19 | RQ3: accuracy/safety trade-off scatter | `plots/rq3_tradeoff_scatter.jpg` |
 | 20 | RQ4: PSBayes-stop stopping rule | `rq4_psbayes_stop_*.csv`, `plots/rq4_psbayes_stop_curve.jpg` |
 | 21 | RQ4: Green Fuzzing coverage-saturation comparison | `coverage_sat_*.csv`, `plots/rq4_psbayes_vs_covsat.jpg` |
+| 22 | Naive-Avg baseline (Table VII row) | `naive_avg.csv` |
 
 ---
 
@@ -207,6 +216,45 @@ The paper will appear in the ICSE 2027 proceedings. Until then, please cite it a
 
 ---
 
-## 9. License
+## 9. Reproducing the fuzzing campaigns
+
+`data/raw/` was produced by a patched libFuzzer running under FuzzBench.
+The patch, the Docker build files, the FuzzBench and LLVM commit pins and
+the launch command are in [`fuzzer/`](fuzzer/README.md).
+
+`LLaplace` and `LGT` are computed inside the patched fuzzer and read out of
+the trace. The notebook does not recompute them.
+
+---
+
+## 10. Naive-Avg baseline
+
+Naive-Avg is the one estimator in Table VII that the fuzzer does not emit.
+It predicts the next TTD as the running mean of every TTD observed so far,
+so it is derived from the `TrialsToDisc` column:
+
+```bash
+python3 scripts/naive_avg.py      # or run CELL-22 in the notebook
+```
+
+Both write `data/csv/naive_avg.csv` and print the Table VII row. They score
+Naive-Avg with the same `calculate_table2_metrics` used for every other
+estimator (CELL-11), so the row is directly comparable.
+
+Reproduced against the published Table VII row:
+
+| Metric | This artifact | Paper |
+|---|---|---|
+| W-SMAPE | 200.54 +- 14.56 | 200.47 +- 14.59 |
+| UE-Rate | 37.43 +- 6.83 | 37.44 +- 6.84 |
+| OE-Max | 0.08 +- 0.39 | 0.08 +- 0.43 |
+| OE-Avg | -0.74 +- 0.58 | -0.75 +- 0.63 |
+
+The residual differences are rounding-level and come from how the running
+mean is rounded before scoring.
+
+---
+
+## 11. License
 
 MIT — see [LICENSE](LICENSE).
