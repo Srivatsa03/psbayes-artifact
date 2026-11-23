@@ -1,0 +1,54 @@
+cff-version: 1.2.0
+message: "If you use this artifact, please cite the paper below."
+title: "PSBayes: A Bayesian Approach to Estimating Residual Risk of Fuzzing (artifact)"
+abstract: >-
+  Replication artifact for the ICSE 2027 paper "A Bayesian Approach to
+  Estimating Residual Risk of Fuzzing". Contains the raw campaign data for
+  eight FuzzBench benchmarks, the notebook that regenerates every table and
+  figure, the libFuzzer patch used to instrument the campaigns, and the
+  launch scripts and commit pins needed to rerun them.
+type: software
+license: MIT
+authors:
+  - family-names: Kamballa
+    given-names: Srivatsa
+    affiliation: "University of Illinois Chicago"
+  - family-names: Huang
+    given-names: Kaiming
+    affiliation: "Pennsylvania State University"
+  - family-names: Shevade
+    given-names: "Rahul R"
+    affiliation: "Pennsylvania State University"
+  - family-names: Noller
+    given-names: Yannic
+    affiliation: "Ruhr University Bochum"
+  - family-names: Tan
+    given-names: Gang
+    affiliation: "Pennsylvania State University"
+  - family-names: Tizpaz-Niari
+    given-names: Saeid
+    affiliation: "University of Illinois Chicago"
+keywords:
+  - fuzzing
+  - residual risk
+  - Bayesian inference
+  - greybox fuzzing
+  - software testing
+preferred-citation:
+  type: conference-paper
+  title: "A Bayesian Approach to Estimating Residual Risk of Fuzzing"
+  year: 2027
+  collection-title: "Proceedings of the IEEE/ACM 49th International Conference on Software Engineering (ICSE)"
+  authors:
+    - family-names: Kamballa
+      given-names: Srivatsa
+    - family-names: Huang
+      given-names: Kaiming
+    - family-names: Shevade
+      given-names: "Rahul R"
+    - family-names: Noller
+      given-names: Yannic
+    - family-names: Tan
+      given-names: Gang
+    - family-names: Tizpaz-Niari
+      given-names: Saeid
