@@ -13,7 +13,13 @@ estimator: converted to time units by dividing by Rate, with row 0 and
 Rate=0 rows dropped, under the same W-SMAPE / UE / OE definitions used in
 CELL-11 of main_analysis.ipynb.
 
-Writes data/csv/naive_avg.csv and prints the Table VII row.
+Writes data/csv/naive_avg_full.csv and prints the paper's Naive-Avg row
+(tab:rq3-aggregate) with all seven metrics.
+
+CELL-22 of main_analysis.ipynb owns data/csv/naive_avg.csv and emits the
+four metrics it needs; this script is the standalone equivalent and adds
+UE-Max, UE-Avg and OE-Rate, so the whole paper row can be checked without
+opening the notebook. Both agree cell for cell.
 
 Usage:  python3 scripts/naive_avg.py        (run from the repo root)
 """
@@ -41,7 +47,8 @@ def table2_metrics(y_true, y_pred, rate):
     mask = np.isfinite(y_true) & np.isfinite(y_pred) & (y_true > 0) & (y_pred > 0)
     y_true, y_pred, r = y_true[mask], y_pred[mask], rate[mask]
     if len(y_true) == 0:
-        return dict(UE_Cnt=0, UE_Pct=0.0, OE_Max=0.0, OE_Avg=0.0, SMAPE=0.0)
+        return dict(UE_Cnt=0, UE_Pct=0.0, UE_Max=0.0, UE_Avg=0.0,
+                    OE_Pct=0.0, OE_Max=0.0, OE_Avg=0.0, SMAPE=0.0)
     valid = r != 0
     y_true = y_true[valid] / r[valid]
     y_pred = y_pred[valid] / r[valid]
@@ -51,7 +58,15 @@ def table2_metrics(y_true, y_pred, rate):
     ue_cnt = int(np.sum(under))
     ue_pct = round(ue_cnt / len(errors) * 100, 2)
 
+    if np.any(under):
+        u = np.abs(errors[under])
+        ue_max = round(math.log10(u.max()), 2) if u.max() > 0 else 0.0
+        ue_avg = round(math.log10(u.mean()), 2) if u.mean() > 0 else 0.0
+    else:
+        ue_max = ue_avg = 0.0
+
     over = errors > 0
+    oe_pct = round(int(np.sum(over)) / len(errors) * 100, 2)
     if np.any(over):
         v = errors[over]
         oe_max = round(math.log10(v.max()), 2) if v.max() > 0 else 0.0
@@ -64,8 +79,8 @@ def table2_metrics(y_true, y_pred, rate):
     weights = np.where(y_pred < y_true, 2.0, 1.0)
     smape = round(float(np.mean(weights * np.abs(y_pred - y_true) / denom) * 100), 2)
 
-    return dict(UE_Cnt=ue_cnt, UE_Pct=ue_pct,
-                OE_Max=oe_max, OE_Avg=oe_avg, SMAPE=smape)
+    return dict(UE_Cnt=ue_cnt, UE_Pct=ue_pct, UE_Max=ue_max, UE_Avg=ue_avg,
+                OE_Pct=oe_pct, OE_Max=oe_max, OE_Avg=oe_avg, SMAPE=smape)
 
 
 def main():
@@ -87,8 +102,9 @@ def main():
         m['Benchmark'] = name
         rows.append(m)
 
-    out = os.path.join(root, 'data', 'csv', 'naive_avg.csv')
-    cols = ['Benchmark', 'UE_Cnt', 'UE_Pct', 'OE_Max', 'OE_Avg', 'SMAPE']
+    out = os.path.join(root, 'data', 'csv', 'naive_avg_full.csv')
+    cols = ['Benchmark', 'UE_Cnt', 'UE_Pct', 'UE_Max', 'UE_Avg',
+            'OE_Pct', 'OE_Max', 'OE_Avg', 'SMAPE']
     with open(out, 'w', newline='') as fh:
         w = csv.DictWriter(fh, fieldnames=cols)
         w.writeheader()
@@ -107,12 +123,15 @@ def main():
         return np.mean(v), np.std(v, ddof=1)
 
     print('-' * 62)
-    print('Table VII row (mean +- sample std across the eight benchmarks):')
+    print('Naive-Avg row of tab:rq3-aggregate'
+          ' (mean +- sample std across the eight benchmarks):')
     for label, key in [('W-SMAPE', 'SMAPE'), ('UE-Rate', 'UE_Pct'),
-                       ('OE-Max', 'OE_Max'), ('OE-Avg', 'OE_Avg')]:
+                       ('UE-Max', 'UE_Max'), ('UE-Avg', 'UE_Avg'),
+                       ('OE-Rate', 'OE_Pct'), ('OE-Max', 'OE_Max'),
+                       ('OE-Avg', 'OE_Avg')]:
         mu, sd = ms(key)
         print(f'  {label:<9} {mu:8.2f} +- {sd:5.2f}')
-    print('\nSaved: data/csv/naive_avg.csv')
+    print('\nSaved: data/csv/naive_avg_full.csv')
 
 
 if __name__ == '__main__':

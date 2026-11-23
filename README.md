@@ -148,6 +148,7 @@ numbers shift between versions; labels do not.
 | `tab:rq3-per-bench` — Per-benchmark RQ3 results | CELL-11 | `data/csv/table2_baselines.csv`, `table2_ours.csv` |
 | `tab:rq4-perbench-lam` — Stopping-rule regimes ($\lambda$ sweep) | CELL-20 | `data/csv/rq4_psbayes_stop_avg.csv` |
 | `tab:rq4-covsat-compact` — Coverage-saturation comparison | CELL-21 | `data/csv/coverage_sat_sweep_trials.csv` |
+| `tab:rq3-aggregate` — Naive-Avg row, all seven metrics | `scripts/naive_avg.py` | `data/csv/naive_avg_full.csv` |
 | `fig:rq1-true-grid` | CELL-17 | `plots/rq1_true_grid_heatmap.jpg` |
 | `fig:rq3-postmean-overshoot` | CELL-15 | `plots/timeseries/fig3_postmean_oraclefree_vs_ttd.jpg` |
 | `fig:rq3-psbayes-tracking` | CELL-15 | `plots/timeseries/fig4_psbayes_vs_ttd.jpg` |
